@@ -1,0 +1,13 @@
+services:
+  backend:
+    build: backend
+  server:
+    image: "nginx"
+    ports:
+      - "23500:80" # '富' = U+5BCC = 23500
+    volumes:
+      - type: bind
+        source: "server.conf"
+        target: "/etc/nginx/conf.d/server.conf"
+    depends_on:
+      - backend
