@@ -1,4 +1,9 @@
-use axum::{response::Html, routing::get, Router};
+use axum::{
+    extract::ws::{Message, WebSocket, WebSocketUpgrade},
+    response::Response,
+    routing::get,
+    Router,
+};
 
 #[tokio::main]
 async fn main() {
@@ -7,6 +12,20 @@ async fn main() {
     axum::serve(listener, app).await.unwrap();
 }
 
-async fn handler() -> Html<&'static str> {
-    Html("<p>hello, world</p>")
+async fn handler(ws: WebSocketUpgrade) -> Response {
+    ws.on_upgrade(game_server)
+}
+
+async fn game_server(mut ws: WebSocket) {
+    while let Some(Ok(msg)) = ws.recv().await {
+        if let Message::Text(msg) = msg {
+            if ws
+                .send(Message::Text(format!("You said: {msg}")))
+                .await
+                .is_err()
+            {
+                break;
+            }
+        }
+    }
 }
