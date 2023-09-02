@@ -1,4 +1,6 @@
 services:
+  web:
+    build: web
   backend:
     build: backend
   server:
